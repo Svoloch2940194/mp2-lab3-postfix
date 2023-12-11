@@ -55,11 +55,11 @@ TEST(TStack, check_for_return_after_deletion2)
 TEST(TStack, check_for_return_after_deletion2)
 {
 	TStack<int> st(5);
-	ASSERT_ANY_THROW(st.sz() == 5);
+	ASSERT_TRUE(st.sz() == 5);
 }
 
 TEST(TStack, check_for_return_after_deletion2)
 {
 	TStack<int> st;
-	ASSERT_ANY_THROW(st.sz() == 1);
+	ASSERT_TRUE(st.sz() == 1);
 }
