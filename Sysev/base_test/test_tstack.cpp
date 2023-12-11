@@ -38,3 +38,28 @@ TEST(TStack, check_for_return_after_deletion)
 	st.push(1);
 	ASSERT_TRUE(st.pop() == 1);
 }
+
+TEST(TStack, check_for_return_after_deletion1)
+{
+	TStack<int> st;
+	st.push(1);
+	ASSERT_NO_THROW(st.get_top());
+}
+
+TEST(TStack, check_for_return_after_deletion2)
+{
+	TStack<int> st;
+	ASSERT_ANY_THROW(st.pop());
+}
+
+TEST(TStack, check_for_return_after_deletion2)
+{
+	TStack<int> st(5);
+	ASSERT_ANY_THROW(st.sz() == 5);
+}
+
+TEST(TStack, check_for_return_after_deletion2)
+{
+	TStack<int> st;
+	ASSERT_ANY_THROW(st.sz() == 1);
+}
