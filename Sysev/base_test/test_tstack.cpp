@@ -23,6 +23,7 @@ TEST(TStack, check_for_top_element)
 {
 	TStack<int> s;
 	s.push(1);
+	s.pop();
 	ASSERT_TRUE(s.get_top() == 1);
 }
 
