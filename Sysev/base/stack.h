@@ -1,164 +1,68 @@
-#ifndef __POSTFIX_H__
-#define __POSTFIX_H__
-
-#include <string>
-#include<map>
-#include "stack.h"
+#ifndef __STACK_H__
+#define __STACK_H__
 
 using namespace std;
 
-class TPostfix
+#include<iostream>
+const size_t MaxStackSize = 100;
+
+template <class T>
+class TStack
 {
-    string infix;
-    string postfix;
+    T* pMem;
+    size_t size;
+    int top;
 public:
-    TPostfix(string s = "0")
+    TStack(size_t _size = 1)
     {
-        for (auto i : s) if (i != ' ') infix += i;
+        size = _size;
+        top = -1;
+        if ((size < 1) || (size > MaxStackSize)) throw size;
+        pMem = new T[size];
     }
-    string GetInfix() { return infix; }
-    string GetPostfix() { return postfix; }
-    string ToPostfix()
+
+    ~TStack()
     {
-        map<char, int> pr;
-        pr['('] = 0;
-        pr[')'] = 0;
-        pr['+'] = 1;
-        pr['-'] = 1;
-        pr['*'] = 2;
-        pr['/'] = 2;
-        int kol = 0;
-        TStack<char> si;
-        string s = "";
-        for (auto i : infix) if (i != ' ')s += i;
+        delete[] pMem;
+    }
 
-        char last = ' ';
-
-        for (auto i : s)
+    void push(T x)
+    {
+        ++top;
+        if (top == size)
         {
-            if (i >= '0' && i <= '9')
-            {
-                if (last == ')')
-                {
-                    if (si.empty()) si.push('*');
-                    if (pr[si.get_top()] < pr['*']) si.push('*');
-                    else
-                    {
-                        while (!si.empty() && pr[si.get_top()] >= pr['*']) postfix += si.pop();
-                        si.push('*');
-               
-                    }
-                    postfix += i;
-                    last = i;
-                    continue;
-                }
-                if (i != '0') postfix += i;
-                else
-                {
-                    if (last == '/') throw "div zero!";
-                    else postfix += i;
-                }
-            }
-            else
-            {
-                if (i == '(')
-                {
-                    if (last >= '0' && last <= '9')
-                    {
-                        if (si.empty()) si.push('*');
-                        if (pr[si.get_top()] < pr['*']) si.push('*');
-                        else
-                        {
-                            while (!si.empty() && pr[si.get_top()] >= pr['*']) postfix += si.pop();
-                            si.push('*');
-
-                        }
-                    }
-                    si.push(i), ++kol;
-                }
-                else
-                {
-                    if (i == ')')
-                    {
-                        --kol;
-                        if (kol < 0) throw "error";
-                        while (!si.empty() && si.get_top() != '(') postfix += si.pop();
-                        si.pop();
-                    }
-                    else
-                    {
-                        if (i == '+' || i == '-' || i == '*' || i == '/')
-                        {
-                            if (last == '(' || last == ' ')
-                            {
-                                if (i == '*' || i == '/') throw "error";
-                                else
-                                {
-                                    postfix += '0';
-                                    si.push(i);
-                                }
-                            }
-                            else
-                            {
-                                if (last >= '0' && last <= '9' || last == ')')
-                                {
-                                    if (si.empty()) { si.push(i); last = i; continue; }
-                                    if (pr[si.get_top()] < pr[i]) si.push(i);
-                                    else
-                                    {
-                                        while (!si.empty() && pr[si.get_top()] >= pr[i]) postfix += si.pop();
-                                        si.push(i);
-                                    }
-                                }
-                                else throw "error";
-                            }
-                        }
-                    }
-                }
-
-            }
-            last = i;
+            
+            size = min(2 * size, MaxStackSize);
+            T* new_p = new T[size];
+            for (int i = 0; i < size; ++i) new_p[i] = pMem[i];
+            swap(new_p, pMem);
+            delete[] new_p;
         }
 
-        if (kol > 0) throw "error";
-        while (!si.empty()) postfix += si.pop();
+        if (top == size) throw out_of_range("too many elements");
 
-        return postfix;
-    };
-    double Calculate()
+        pMem[top] = x;
+    }
+
+    T pop()
     {
+        if (top < 0) throw out_of_range("stack is empty");
 
-        double ans = 0;
-        TStack<double> si;
-        for (auto i : postfix)
-        {
-            if (i != ' ')
-            {
-                if (i >= '0' && i <= '9')
-                {
-                    double a = i - '0';
-                    si.push(a);
-                }
-                else
-                {
-                    double x, y;
-                    if (!si.empty()) x = si.pop();
-                    if (!si.empty()) y = si.pop();
+        T x = pMem[top];
+        --top;
+        return x;
+    }
 
-                    if (i == '/')
-                    {
-                        if (y - 0 < 1e-8) throw "error";
-                        else si.push(y / x);
-                    }
-                    if (i == '*') si.push(x * y);
-                    if (i == '-') si.push(y - x);
-                    if (i == '+') si.push(x + y);
-                }
-            }
-        }
+    T get_top()
+    {
+        if (top < 0) throw out_of_range("stack is empty");
 
-        return si.pop();
-    };
+        return pMem[top];
+    }
+
+    bool empty() { return !(top > -1); }
 };
+
+
 
 #endif
